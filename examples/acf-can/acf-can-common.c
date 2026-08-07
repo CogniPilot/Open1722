@@ -333,6 +333,12 @@ int avtp_to_can(uint8_t* pdu, frame_t* can_frames, Avtp_CanVariant_t can_variant
         proc_bytes += acf_msg_length;
         frame_t* frame = &(can_frames[i++]);
 
+        /* The frame array is reused across AVTPDUs and the flag handling
+         * below only ever sets bits, so clear the slot first. Otherwise
+         * FDF, BRS, or ESI left over from an earlier frame in the same
+         * slot would leak onto a later classic frame that never set them. */
+        memset(frame, 0, sizeof(*frame));
+
         // Handle EFF Flag
         if (Avtp_Can_GetEff((Avtp_Can_t*)acf_pdu)) {
             can_id |= CAN_EFF_FLAG;

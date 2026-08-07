@@ -309,6 +309,12 @@ int avtp_to_can(uint8_t* pdu, frame_t* can_frames, Avtp_CanVariant_t can_variant
 
     while (proc_bytes < msg_length) {
 
+        if (i >= MAX_CAN_FRAMES_IN_ACF) {
+            LOG_ERR("Error: AVTPDU carries more than %d ACF CAN messages, "
+                    "truncating.\n", MAX_CAN_FRAMES_IN_ACF);
+            break;
+        }
+
         acf_pdu = &pdu[proc_bytes];
 
         if (!is_valid_acf_packet(acf_pdu)) {
